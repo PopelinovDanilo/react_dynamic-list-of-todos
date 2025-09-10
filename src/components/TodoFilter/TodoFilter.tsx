@@ -1,54 +1,26 @@
-import { useEffect, useMemo, useState } from 'react';
-import { Todo } from '../../types/Todo';
+import React from 'react';
 
-type Props = {
-  todos: Todo[];
-  displayOption: string;
-  onFiltred: (todos: Todo[]) => void;
-  onDisplayed: (option: string) => void;
-};
+interface Props {
+  onQueryChange: (v: string) => void;
+  onFilterChange: (v: string) => void;
+  valueSelect: string;
+  value: string;
+}
 
-export const TodoFilter = ({
-  todos,
-  displayOption,
-  onFiltred,
-  onDisplayed,
-}: Props) => {
-  const [query, setQuery] = useState('');
-  const filtredTodos = useMemo(() => {
-    return todos.filter(todo =>
-      todo.title.toLowerCase().includes(query.toLowerCase()),
-    );
-  }, [query, todos]);
-
-  useEffect(() => {
-    onFiltred(filtredTodos);
-  }, [filtredTodos, onFiltred]);
-
-  const handleQueryChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const value = event.target.value;
-
-    setQuery(value);
-  };
-
-  const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    const value = event.target.value;
-
-    onDisplayed(value);
-  };
-
-  const handleClearSearch = () => {
-    setQuery('');
-  };
-
+export const TodoFilter: React.FC<Props> = ({
+  onQueryChange,
+  onFilterChange,
+  valueSelect,
+  value,
+}) => {
   return (
     <form className="field has-addons">
       <p className="control">
         <span className="select">
           <select
             data-cy="statusSelect"
-            value={displayOption}
-            onChange={handleSelectChange}
+            value={valueSelect}
+            onChange={e => onFilterChange(e.target.value)}
           >
             <option value="all">All</option>
             <option value="active">Active</option>
@@ -63,21 +35,21 @@ export const TodoFilter = ({
           type="text"
           className="input"
           placeholder="Search..."
-          value={query}
-          onChange={handleQueryChange}
+          value={value}
+          onChange={e => onQueryChange(e.target.value)}
         />
         <span className="icon is-left">
           <i className="fas fa-magnifying-glass" />
         </span>
 
-        {query !== '' && (
+        {value.length > 0 && (
           <span className="icon is-right" style={{ pointerEvents: 'all' }}>
             {/* eslint-disable-next-line jsx-a11y/control-has-associated-label */}
             <button
-              onClick={handleClearSearch}
               data-cy="clearSearchButton"
               type="button"
               className="delete"
+              onClick={() => onQueryChange('')}
             />
           </span>
         )}
